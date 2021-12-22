@@ -10,29 +10,25 @@ import {
 import BottomTab from './BottomTab';
 import Feed from './Feed';
 import TopTab from './TopTab';
-import axios from 'axios';
 import {useSelector, useDispatch } from 'react-redux';
 import {SetuserName, channeldetail} from '../actions/index';
 const category = ['Python', 'JavaScript', 'React', 'Comedy', 'Cinema', 'Song'];
 
 
 function Home({navigation}) {
-  const username= "SK";
   const mystate= useSelector((state)=>state.get_user_name);
   const dispatch= useDispatch();
   const [data, setdata] = useState([]);
   const getdata = async () => {
     try {
       const response = await fetch(
-         url,
-      );
+        'https://youtube.googleapis.com/youtube/v3/videos?part=snippet&part=statistics&chart=mostPopular&key='+my_api_key)
       const {items} = await response.json();
       setdata(items);
       console.log(items);
+      dispatch(channeldetail(items));    //storing data in redux store
     } catch (error) {
       console.error(error);
-    } finally {
-      //setLoading(false);
     }
   };
 
@@ -56,7 +52,7 @@ function Home({navigation}) {
     <SafeAreaView style={styles.container}>
       <View style={styles.top}>
         <TopTab username={mystate}
-        onPress={()=> dispatch(SetuserName(username)) } />
+        onPress={()=> navigation.navigate('Search') } />
       </View>
       <View style={styles.feed}>
         <ScrollView>
@@ -76,7 +72,7 @@ function Home({navigation}) {
               <View key={index}>
                 <Feed
                   thumbnail={item.snippet.thumbnails.high.url}
-                  title={(item.snippet.title).slice(0, 60)}
+                  title={(item.snippet.title).slice(0, 50)}
                   channel_name={item.snippet.channelTitle}
                   no_of_views={views_converter(item.statistics.viewCount)}
                   published={String(item.snippet.publishedAt).slice(0, 10)}
